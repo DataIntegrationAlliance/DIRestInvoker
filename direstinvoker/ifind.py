@@ -203,8 +203,8 @@ class IFinDInvoker:
         :return:
         """
         path = 'THS_BasicData/'
-        if type(thscode) == list:
-            thscode = ','.joint(thscode)
+        if type(thsCode) == list:
+            thsCode = ','.joint(thsCode)
         req_data_dic = {"thsCode": thsCode, "indicatorName": indicatorName,
                         "paramOption": paramOption
                         }
