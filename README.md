@@ -1,5 +1,5 @@
 # DIRestInvoker [![Build Status](https://travis-ci.org/DataIntegrationAlliance/DIRestInvoker.svg?branch=master)](https://travis-ci.org/DataIntegrationAlliance/DIRestInvoker)
-调用 [DIRestPlus](https://github.com/DataIntegrationAlliance/DIRestPlus) 接口，实现Wind、iFinD、Choice接口调用
+Data Integration RESTPlus Invoker，调用 [DIRestPlus](https://github.com/DataIntegrationAlliance/DIRestPlus) 接口，实现Wind、iFinD、Choice接口调用
 
 ## 安装
 ```commandline
@@ -24,3 +24,5 @@ except APIError as exp:
     else:
         print(exp.ret_dic.setdefault('error_code', ''), exp.ret_dic['message'])
 ```
+----
+项目地址：[DIRestInvoker](https://github.com/DataIntegrationAlliance/DIRestInvoker)
