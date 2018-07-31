@@ -95,7 +95,7 @@ class IFinDInvoker:
         """
         path = 'THS_DateSerial/'
         if type(thscode) == list:
-            thscode = ','.joint(thscode)
+            thscode = ','.join(thscode)
         req_data_dic = {"thscode": thscode, "jsonIndicator": jsonIndicator,
                         "jsonparam": jsonparam, "globalparam": globalparam,
                         "begintime": format_2_date_str(begintime),
@@ -118,7 +118,7 @@ class IFinDInvoker:
         """
         path = 'THS_HighFrequenceSequence/'
         if type(thscode) == list:
-            thscode = ','.joint(thscode)
+            thscode = ','.join(thscode)
         req_data_dic = {"thscode": thscode, "jsonIndicator": jsonIndicator,
                         "jsonparam": jsonparam,
                         "begintime": format_2_date_str(begintime),
@@ -139,7 +139,7 @@ class IFinDInvoker:
         """
         path = 'THS_RealtimeQuotes/'
         if type(thscode) == list:
-            thscode = ','.joint(thscode)
+            thscode = ','.join(thscode)
         req_data_dic = {"thscode": thscode, "jsonIndicator": jsonIndicator,
                         "jsonparam": jsonparam
                         }
@@ -160,7 +160,7 @@ class IFinDInvoker:
         """
         path = 'THS_HistoryQuotes/'
         if type(thscode) == list:
-            thscode = ','.joint(thscode)
+            thscode = ','.join(thscode)
         req_data_dic = {"thscode": thscode, "jsonIndicator": jsonIndicator,
                         "jsonparam": jsonparam,
                         "begintime": format_2_date_str(begintime),
@@ -183,7 +183,7 @@ class IFinDInvoker:
         """
         path = 'THS_Snapshot/'
         if type(thscode) == list:
-            thscode = ','.joint(thscode)
+            thscode = ','.join(thscode)
         req_data_dic = {"thscode": thscode, "jsonIndicator": jsonIndicator,
                         "jsonparam": jsonparam,
                         "begintime": format_2_date_str(begintime),
@@ -204,7 +204,7 @@ class IFinDInvoker:
         """
         path = 'THS_BasicData/'
         if type(thsCode) == list:
-            thsCode = ','.joint(thsCode)
+            thsCode = ','.join(thsCode)
         req_data_dic = {"thsCode": thsCode, "indicatorName": indicatorName,
                         "paramOption": paramOption
                         }
