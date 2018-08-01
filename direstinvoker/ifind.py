@@ -200,18 +200,41 @@ class IFinDInvoker:
         :param thsCode:同花顺代码，可以是单个代码也可以是多个代码，代码之间用逗号(‘,’)隔开。例如 600004.SH,600007.SH
         :param indicatorName:指标，可以是单个指标也可以是多个指标，指标之间用分号(‘;’)隔开。例如'ths_stock_short_name_stock;ths_np_stock'
         :param paramOption:函数对应的参数，参数和参数之间用逗号(‘，’)隔开。例如';2017-12-31,100'
+        :param max_code_num:最大截取数量
         :return:
         """
         path = 'THS_BasicData/'
+        max_code_num = 8000
+        newlist = []
+        thslist = []
+        i = 0
         if type(thsCode) == list:
-            thsCode = ','.join(thsCode)
-        req_data_dic = {"thsCode": thsCode, "indicatorName": indicatorName,
+            listSize = len(thsCode)
+            while listSize > max_code_num:
+                newlist = newlist.append(thsCode[i*max_code_num:(i+1)*max_code_num])
+                i += 1
+                listSize -= max_code_num
+                newlist = ','.join(newlist)
+                req_data_dic = {"thsCode": newlist, "indicatorName": indicatorName,
+                                 "paramOption": paramOption
+                            }
+                newlist = []
+                req_data = json.dumps(req_data_dic)
+                json_dic = self._public_post(path, req_data)
+                thslist = thslist.append(json_dic)
+            newlist = newlist.append(thsCode[i*max_code_num:])
+            newlist = ','.join(newlist)
+            req_data_dic = {"thsCode": newlist, "indicatorName": indicatorName,
                         "paramOption": paramOption
-                        }
+                    }
+        else:
+            req_data_dic = {"thsCode": thsCode, "indicatorName": indicatorName,
+                            "paramOption": paramOption
+                            }
         req_data = json.dumps(req_data_dic)
         json_dic = self._public_post(path, req_data)
-        # print(json_dic)
-        df = pd.DataFrame(json_dic)
+        thslist = thslist.append(json_dic)
+        df = pd.DataFrame(thslist)
         return df
 
     def THS_DataPool(self, DataPoolname, paramname, FunOption) -> pd.DataFrame:
