@@ -7,6 +7,7 @@ import pandas as pd
 import requests
 import json
 from datetime import datetime, date
+from direstinvoker.utils.fh_utils import split_chunk
 
 STR_FORMAT_DATE = '%Y-%m-%d'
 STR_FORMAT_DATETIME_WIND = '%Y-%m-%d %H:%M:%S'  # 2017-03-06 00:00:00.005000
@@ -194,7 +195,7 @@ class IFinDInvoker:
         df = pd.DataFrame(json_dic)
         return df
 
-    def THS_BasicData(self, thsCode, indicatorName, paramOption) -> pd.DataFrame:
+    def THS_BasicData(self, thsCode, indicatorName, paramOption, max_code_num=None) -> pd.DataFrame:
         """
         基础数据序列
         :param thsCode:同花顺代码，可以是单个代码也可以是多个代码，代码之间用逗号(‘,’)隔开。例如 600004.SH,600007.SH
@@ -204,37 +205,35 @@ class IFinDInvoker:
         :return:
         """
         path = 'THS_BasicData/'
-        max_code_num = 8000
-        newlist = []
-        thslist = []
-        i = 0
+        code_list = []
         if type(thsCode) == list:
-            listSize = len(thsCode)
-            while listSize > max_code_num:
-                newlist = newlist.append(thsCode[i*max_code_num:(i+1)*max_code_num])
-                i += 1
-                listSize -= max_code_num
-                newlist = ','.join(newlist)
-                req_data_dic = {"thsCode": newlist, "indicatorName": indicatorName,
-                                 "paramOption": paramOption
-                            }
-                newlist = []
-                req_data = json.dumps(req_data_dic)
-                json_dic = self._public_post(path, req_data)
-                thslist = thslist.append(json_dic)
-            newlist = newlist.append(thsCode[i*max_code_num:])
-            newlist = ','.join(newlist)
-            req_data_dic = {"thsCode": newlist, "indicatorName": indicatorName,
-                        "paramOption": paramOption
-                    }
+            # 如果是 list 数据，自动 ',' 链接
+            if max_code_num is None:
+                code_list.append(','.join(thsCode))
+            else:
+                # 如果 max_code_num 有值，自动分段切割
+                for a_list in split_chunk(thsCode, max_code_num):
+                    code_list.append(','.join(a_list))
         else:
-            req_data_dic = {"thsCode": thsCode, "indicatorName": indicatorName,
+            code_list.append(thsCode)
+
+        df_list = []
+        for a_list in code_list:
+            req_data_dic = {"thsCode": a_list, "indicatorName": indicatorName,
                             "paramOption": paramOption
                             }
-        req_data = json.dumps(req_data_dic)
-        json_dic = self._public_post(path, req_data)
-        thslist = thslist.append(json_dic)
-        df = pd.DataFrame(thslist)
+            req_data = json.dumps(req_data_dic)
+            json_dic = self._public_post(path, req_data)
+            if json_dic is None or len(json_dic) == 0:
+                continue
+            df = pd.DataFrame(json_dic)
+            df_list.append(df)
+
+        # 合并数据
+        if len(df_list) > 0:
+            df = pd.concat(df_list)
+        else:
+            df = None
         return df
 
     def THS_DataPool(self, DataPoolname, paramname, FunOption) -> pd.DataFrame:

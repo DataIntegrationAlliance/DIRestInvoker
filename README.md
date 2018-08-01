@@ -24,5 +24,12 @@ except APIError as exp:
     else:
         print(exp.ret_dic.setdefault('error_code', ''), exp.ret_dic['message'])
 ```
+
+## 修改历史
+
+* version 0.1.4
+
+  > THS_BasicData 支持 list 作为 thsCode 参数，并且支持按一定数量自动分割发送（解决大批量数据请求的情况下，20W数字限制，可能引发-205错误的问题）
+
 ----
 项目地址：[DIRestInvoker](https://github.com/DataIntegrationAlliance/DIRestInvoker)
