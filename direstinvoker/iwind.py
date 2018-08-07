@@ -80,7 +80,7 @@ class WindRestInvoker:
         if ret_data.status_code != 200:
             raise APIError(ret_data.status_code, ret_dic)
         else:
-            return ret_data.status_code, ret_dic
+            return ret_dic
 
     def wset(self, tablename, options) -> pd.DataFrame:
         """
