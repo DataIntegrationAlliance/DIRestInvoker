@@ -105,6 +105,10 @@ class WindRestInvoker:
         :return:
         """
         path = 'wss/'
+        if isinstance(codes, list):
+            codes = ','.join(codes)
+        if isinstance(fields, list):
+            fields = ','.join(fields)
         req_data_dic = {"codes": codes, "fields": fields, "options": options}
         req_data = json.dumps(req_data_dic)
         json_dic = self.public_post(path, req_data)
@@ -122,6 +126,10 @@ class WindRestInvoker:
         :return:
         """
         path = 'wsd/'
+        if isinstance(codes, list):
+            codes = ','.join(codes)
+        if isinstance(fields, list):
+            fields = ','.join(fields)
         req_data_dic = {"codes": codes, "fields": fields,
                         "beginTime": format_2_date_str(beginTime),
                         "endTime": format_2_date_str(endTime),
@@ -142,6 +150,10 @@ class WindRestInvoker:
         :return:
         """
         path = 'wsi/'
+        if isinstance(codes, list):
+            codes = ','.join(codes)
+        if isinstance(fields, list):
+            fields = ','.join(fields)
         req_data_dic = {"codes": codes, "fields": fields,
                         "beginTime": format_2_date_str(beginTime),
                         "endTime": format_2_date_str(endTime),
@@ -162,6 +174,10 @@ class WindRestInvoker:
         :return:
         """
         path = 'wst/'
+        if isinstance(codes, list):
+            codes = ','.join(codes)
+        if isinstance(fields, list):
+            fields = ','.join(fields)
         req_data_dic = {"codes": codes, "fields": fields,
                         "beginTime": format_2_datetime_str(beginTime),
                         "endTime": format_2_datetime_str(endTime),
@@ -180,6 +196,10 @@ class WindRestInvoker:
         :return:
         """
         path = 'wsq/'
+        if isinstance(codes, list):
+            codes = ','.join(codes)
+        if isinstance(fields, list):
+            fields = ','.join(fields)
         req_data_dic = {"codes": codes, "fields": fields, "options": options}
         req_data = json.dumps(req_data_dic)
         json_dic = self.public_post(path, req_data)
@@ -230,6 +250,8 @@ class WindRestInvoker:
         :return:
         """
         path = 'edb/'
+        if isinstance(codes, list):
+            codes = ','.join(codes)
         req_data_dic = {"codes": codes,
                         "beginTime": format_2_date_str(beginTime),
                         "endTime": format_2_date_str(endTime),
@@ -245,14 +267,14 @@ if __name__ == "__main__":
     url_str = "http://localhost:5000/wind/"
     invoker = WindRestInvoker(url_str)
     # data_df = invoker.wset(tablename="sectorconstituent", options="date=2017-03-21;sectorid=1000023121000000")
-    # data_df = invoker.wss(codes="QHZG160525.OF", fields="fund_setupdate,fund_maturitydate,fund_mgrcomp,fund_existingyear,fund_ptmyear,fund_type,fund_fundmanager")
+    # data_df = invoker.wss(codes=["601398.SH", "600123.SH"], fields="sec_name,trade_code,ipo_date,delist_date,mkt,exch_city,exch_eng,prename")
     # data_df = invoker.wsd("601398.SH", "open,high,low,close,volume", "2017-01-04", "2017-02-28", "PriceAdj=F")
     # data_df = invoker.tdays(begin_time="2017-01-04", end_time="2017-02-28")
     # data_df = invoker.wst("600000.SH", "ask1,bid1,asize1,bsize1,volume,amt,pre_close,open,high,low,last", "2017-10-20 09:15:00", "2017-10-20 09:26:00", "")
     # data_df = invoker.wsi("RU1801.SHF", "open,high,low,close,volume,amt,oi", "2017-12-8 09:00:00", "2017-12-8 11:30:00", "")
 
     try:
-        data_df = invoker.wset(tablename="sectorconstituent", options="date=2017-03-21;sectorid=1000023121000000")
+        data_df = invoker.wss(codes=["601398.SH", "600123.SH"], fields="sec_name,trade_code,ipo_date,delist_date,mkt,exch_city,exch_eng,prename")
         print(data_df)
     except APIError as exp:
         if exp.status == 500:
