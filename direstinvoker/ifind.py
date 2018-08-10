@@ -110,23 +110,30 @@ class IFinDInvoker:
             code_list.append(thscode)
 
         df_list = []
-        for sub_list in code_list:
-            req_data_dic = {"thscode": sub_list, "jsonIndicator": jsonIndicator,
-                            "jsonparam": jsonparam, "globalparam": globalparam,
-                            "begintime": format_2_date_str(begintime),
-                            "endtime": format_2_date_str(endtime)
-                            }
-            req_data = json.dumps(req_data_dic)
-            json_dic = self._public_post(path, req_data)
-            if json_dic is None or len(json_dic) == 0:
-                continue
-            df = pd.DataFrame(json_dic)
-            df_list.append(df)
-
-        if len(df_list) > 0:
-            df = pd.concat(df_list)
-        else:
-            df = None
+        try:
+            for sub_list in code_list:
+                req_data_dic = {"thscode": sub_list, "jsonIndicator": jsonIndicator,
+                                "jsonparam": jsonparam, "globalparam": globalparam,
+                                "begintime": format_2_date_str(begintime),
+                                "endtime": format_2_date_str(endtime)
+                                }
+                req_data = json.dumps(req_data_dic)
+                json_dic = self._public_post(path, req_data)
+                if json_dic is None or len(json_dic) == 0:
+                    continue
+                df = pd.DataFrame(json_dic)
+                df_list.append(df)
+        except APIError as exp:
+            if len(df_list) == 0:
+                raise exp from exp
+            else:
+                # 对于分段查询的情况，如果中途某一段产生错误（可能是流量不够）则不抛出异常，而将已查询出来的数据返回
+                logger.exception('THS_DateSerial(%s, %s, %s, %s,%s, %s, %s, %s) 失败', thscode, jsonIndicator, jsonparam, globalparam, begintime, endtime, max_code_num)
+        finally:
+            if len(df_list) > 0:
+                df = pd.concat(df_list)
+            else:
+                df = None
         return df
 
     def THS_HighFrequenceSequence(self, thscode, jsonIndicator, jsonparam, begintime, endtime,max_code_num=None) -> pd.DataFrame:
@@ -152,23 +159,30 @@ class IFinDInvoker:
             code_list.append(thscode)
 
         df_list = []
-        for sub_list in code_list:
-            req_data_dic = {"thscode": sub_list, "jsonIndicator": jsonIndicator,
-                            "jsonparam": jsonparam,
-                            "begintime": format_2_date_str(begintime),
-                            "endtime": format_2_date_str(endtime)
-                            }
-            req_data = json.dumps(req_data_dic)
-            json_dic = self._public_post(path, req_data)
-            if json_dic is None or len(json_dic) == 0:
-                continue
-            df = pd.DataFrame(json_dic)
-            df_list.append(df)
-
-        if len(df_list) > 0:
-            df = pd.concat(df_list)
-        else:
-            df = None
+        try:
+            for sub_list in code_list:
+                req_data_dic = {"thscode": sub_list, "jsonIndicator": jsonIndicator,
+                                "jsonparam": jsonparam,
+                                "begintime": format_2_date_str(begintime),
+                                "endtime": format_2_date_str(endtime)
+                                }
+                req_data = json.dumps(req_data_dic)
+                json_dic = self._public_post(path, req_data)
+                if json_dic is None or len(json_dic) == 0:
+                    continue
+                df = pd.DataFrame(json_dic)
+                df_list.append(df)
+        except APIError as exp:
+            if len(df_list) == 0:
+                raise exp from exp
+            else:
+                # 对于分段查询的情况，如果中途某一段产生错误（可能是流量不够）则不抛出异常，而将已查询出来的数据返回
+                logger.exception('THS_HighFrequenceSequence(%s, %s, %s, %s,%s, %s, %s) 失败', thscode, jsonIndicator, jsonparam, begintime, endtime, max_code_num)
+        finally:
+            if len(df_list) > 0:
+                df = pd.concat(df_list)
+            else:
+                df = None
         return df
 
     def THS_RealtimeQuotes(self, thscode, jsonIndicator, jsonparam, max_code_num=None) -> pd.DataFrame:
@@ -192,21 +206,28 @@ class IFinDInvoker:
             code_list.append(thscode)
 
         df_list = []
-        for sub_list in code_list:
-            req_data_dic = {"thscode": sub_list, "jsonIndicator": jsonIndicator,
-                            "jsonparam": jsonparam
-                            }
-            req_data = json.dumps(req_data_dic)
-            json_dic = self._public_post(path, req_data)
-            if json_dic is None or len(json_dic) == 0:
-                continue
-            df = pd.DataFrame(json_dic)
-            df_list.append(df)
-
-        if len(df_list) > 0:
-            df = pd.concat(df_list)
-        else:
-            df = None
+        try:
+            for sub_list in code_list:
+                req_data_dic = {"thscode": sub_list, "jsonIndicator": jsonIndicator,
+                                "jsonparam": jsonparam
+                                }
+                req_data = json.dumps(req_data_dic)
+                json_dic = self._public_post(path, req_data)
+                if json_dic is None or len(json_dic) == 0:
+                    continue
+                df = pd.DataFrame(json_dic)
+                df_list.append(df)
+        except APIError as exp:
+            if len(df_list) == 0:
+                raise exp from exp
+            else:
+                # 对于分段查询的情况，如果中途某一段产生错误（可能是流量不够）则不抛出异常，而将已查询出来的数据返回
+                logger.exception('THS_RealtimeQuotes(%s, %s, %s, %s) 失败', thscode, jsonIndicator, jsonparam, max_code_num)
+        finally:
+            if len(df_list) > 0:
+                df = pd.concat(df_list)
+            else:
+                df = None
         return df
 
     def THS_HistoryQuotes(self, thscode, jsonIndicator, jsonparam, begintime, endtime, max_code_num=None) -> pd.DataFrame:
@@ -233,23 +254,30 @@ class IFinDInvoker:
             code_list.append(thscode)
 
         df_list = []
-        for sub_list in code_list:
-            req_data_dic = {"thscode": sub_list, "jsonIndicator": jsonIndicator,
-                            "jsonparam": jsonparam,
-                            "begintime": format_2_date_str(begintime),
-                            "endtime": format_2_date_str(endtime)
-                            }
-            req_data = json.dumps(req_data_dic)
-            json_dic = self._public_post(path, req_data)
-            if json_dic is None or len(json_dic) == 0:
-                continue
-            df = pd.DataFrame(json_dic)
-            df_list.append(df)
-
-        if len(df_list) > 0:
-            df = pd.concat(df_list)
-        else:
-            df = None
+        try:
+            for sub_list in code_list:
+                req_data_dic = {"thscode": sub_list, "jsonIndicator": jsonIndicator,
+                                "jsonparam": jsonparam,
+                                "begintime": format_2_date_str(begintime),
+                                "endtime": format_2_date_str(endtime)
+                                }
+                req_data = json.dumps(req_data_dic)
+                json_dic = self._public_post(path, req_data)
+                if json_dic is None or len(json_dic) == 0:
+                    continue
+                df = pd.DataFrame(json_dic)
+                df_list.append(df)
+        except APIError as exp:
+            if len(df_list) == 0:
+                raise exp from exp
+            else:
+                # 对于分段查询的情况，如果中途某一段产生错误（可能是流量不够）则不抛出异常，而将已查询出来的数据返回
+                logger.exception('THS_HistoryQuotes(%s, %s, %s, %s, %s, %s) 失败', thscode, jsonIndicator, jsonparam, begintime, endtime, max_code_num)
+        finally:
+            if len(df_list) > 0:
+                df = pd.concat(df_list)
+            else:
+                df = None
         return df
 
     def THS_Snapshot(self, thscode, jsonIndicator, jsonparam, begintime, endtime, max_code_num=None) -> pd.DataFrame:
@@ -276,23 +304,30 @@ class IFinDInvoker:
             code_list.append(thscode)
 
         df_list = []
-        for sub_list in code_list:
-            req_data_dic = {"thscode": sub_list, "jsonIndicator": jsonIndicator,
-                            "jsonparam": jsonparam,
-                            "begintime": format_2_date_str(begintime),
-                            "endtime": format_2_date_str(endtime)
-                            }
-            req_data = json.dumps(req_data_dic)
-            json_dic = self._public_post(path, req_data)
-            if json_dic is None or len(json_dic) == 0:
-                continue
-            df = pd.DataFrame(json_dic)
-            df_list.append(df)
-
-        if len(df_list) > 0:
-            df = pd.concat(df_list)
-        else:
-            df = None
+        try:
+            for sub_list in code_list:
+                req_data_dic = {"thscode": sub_list, "jsonIndicator": jsonIndicator,
+                                "jsonparam": jsonparam,
+                                "begintime": format_2_date_str(begintime),
+                                "endtime": format_2_date_str(endtime)
+                                }
+                req_data = json.dumps(req_data_dic)
+                json_dic = self._public_post(path, req_data)
+                if json_dic is None or len(json_dic) == 0:
+                    continue
+                df = pd.DataFrame(json_dic)
+                df_list.append(df)
+        except APIError as exp:
+            if len(df_list) == 0:
+                raise exp from exp
+            else:
+                # 对于分段查询的情况，如果中途某一段产生错误（可能是流量不够）则不抛出异常，而将已查询出来的数据返回
+                logger.exception('THS_Snapshot(%s, %s, %s, %s, %s, %s) 失败', thscode, jsonIndicator, jsonparam, begintime, endtime, max_code_num)
+        finally:
+            if len(df_list) > 0:
+                df = pd.concat(df_list)
+            else:
+                df = None
         return df
 
     def THS_BasicData(self, thsCode, indicatorName, paramOption, max_code_num=None) -> pd.DataFrame:
@@ -406,7 +441,7 @@ if __name__ == "__main__":
     invoker = IFinDInvoker(url_str)
 
     try:
-        data_df = invoker.THS_DateQuery('SSE', 'dateType:0,period:D,dateFormat:0', '2018-06-15', '2018-06-21')
+        data_df = invoker.THS_HighFrequenceSequence('300033.SZ,600000.SH','open;high;low;close','CPS:0,MaxPoints:50000,Fill:Previous,Interval:1','2018-05-31 09:30:00','2018-05-31 09:32:00')
         print(data_df)
     except APIError as exp:
         if exp.status == 500:
