@@ -6,9 +6,11 @@ Created on 2016-12-22
 import pandas as pd
 import requests
 import json
+import logging
 from datetime import datetime, date
 from direstinvoker.utils.fh_utils import split_chunk
 
+logger = logging.getLogger('ifind')
 STR_FORMAT_DATE = '%Y-%m-%d'
 STR_FORMAT_DATETIME_WIND = '%Y-%m-%d %H:%M:%S'  # 2017-03-06 00:00:00.005000
 UN_AVAILABLE_DATETIME = datetime.strptime('1900-01-01', STR_FORMAT_DATE)
@@ -316,22 +318,29 @@ class IFinDInvoker:
             code_list.append(thsCode)
 
         df_list = []
-        for a_list in code_list:
-            req_data_dic = {"thsCode": a_list, "indicatorName": indicatorName,
-                            "paramOption": paramOption
-                            }
-            req_data = json.dumps(req_data_dic)
-            json_dic = self._public_post(path, req_data)
-            if json_dic is None or len(json_dic) == 0:
-                continue
-            df = pd.DataFrame(json_dic)
-            df_list.append(df)
-
-        # 合并数据
-        if len(df_list) > 0:
-            df = pd.concat(df_list)
-        else:
-            df = None
+        try:
+            for a_list in code_list:
+                req_data_dic = {"thsCode": a_list, "indicatorName": indicatorName,
+                                "paramOption": paramOption
+                                }
+                req_data = json.dumps(req_data_dic)
+                json_dic = self._public_post(path, req_data)
+                if json_dic is None or len(json_dic) == 0:
+                    continue
+                df = pd.DataFrame(json_dic)
+                df_list.append(df)
+        except APIError as exp:
+            if len(df_list) == 0:
+                raise exp from exp
+            else:
+                # 对于分段查询的情况，如果中途某一段产生错误（可能是流量不够）则不抛出异常，而将已查询出来的数据返回
+                logger.exception('THS_BasicData(%s, %s, %s, %s) 失败', thsCode, indicatorName, paramOption, max_code_num)
+        finally:
+            # 合并数据
+            if len(df_list) > 0:
+                df = pd.concat(df_list)
+            else:
+                df = None
         return df
 
     def THS_DataPool(self, DataPoolname, paramname, FunOption) -> pd.DataFrame:
