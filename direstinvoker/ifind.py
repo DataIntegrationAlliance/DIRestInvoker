@@ -185,7 +185,7 @@ class IFinDInvoker:
                 df = None
         return df
 
-    def THS_RealtimeQuotes(self, thscode, jsonIndicator, jsonparam, max_code_num=None) -> pd.DataFrame:
+    def THS_RealtimeQuotes(self, thscode, jsonIndicator, jsonparam="", max_code_num=None) -> pd.DataFrame:
         """
         实时序列
         :param thscode:同花顺代码，可以是单个代码也可以是多个代码，代码之间用逗号(‘,’)隔开。例如 600004.SH,600007.SH
@@ -441,7 +441,7 @@ if __name__ == "__main__":
     invoker = IFinDInvoker(url_str)
 
     try:
-        data_df = invoker.THS_HighFrequenceSequence('300033.SZ,600000.SH','open;high;low;close','CPS:0,MaxPoints:50000,Fill:Previous,Interval:1','2018-05-31 09:30:00','2018-05-31 09:32:00')
+        data_df = invoker.THS_DateSerial('300033.SZ,600000.SH','ths_stock_short_name_stock;ths_np_stock',';100','Days:Tradedays,Fill:Previous,Interval:D','2017-12-28','2018-01-04')
         print(data_df)
     except APIError as exp:
         if exp.status == 500:
