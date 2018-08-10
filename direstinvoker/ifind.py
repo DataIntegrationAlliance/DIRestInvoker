@@ -67,7 +67,7 @@ class APIError(Exception):
 class IFinDInvoker:
     def __init__(self, url_str):
         self.url = url_str
-        self.header = {'Content-Type': 'application/json'}
+        self.header = {'Content-Type': 'application/json','Connection': 'close'}
 
     def _url(self, path: str) -> str:
         return self.url + path
@@ -83,7 +83,7 @@ class IFinDInvoker:
         else:
             return ret_dic
 
-    def THS_DateSerial(self, thscode, jsonIndicator, jsonparam, globalparam, begintime, endtime) -> pd.DataFrame:
+    def THS_DateSerial(self, thscode, jsonIndicator, jsonparam, globalparam, begintime, endtime, max_code_num=None) -> pd.DataFrame:
         """
         日期序列
         :param thscode:同花顺代码，可以是单个代码也可以是多个代码，代码之间用逗号(‘,’)隔开。例如 600004.SH,600007.SH
@@ -95,19 +95,39 @@ class IFinDInvoker:
         :return:
         """
         path = 'THS_DateSerial/'
+        code_list = []
         if type(thscode) == list:
-            thscode = ','.join(thscode)
-        req_data_dic = {"thscode": thscode, "jsonIndicator": jsonIndicator,
-                        "jsonparam": jsonparam, "globalparam": globalparam,
-                        "begintime": format_2_date_str(begintime),
-                        "endtime": format_2_date_str(endtime)
-                        }
-        req_data = json.dumps(req_data_dic)
-        json_dic = self._public_post(path, req_data)
-        df = pd.DataFrame(json_dic)
+            # 如果是 list 数据，自动 ',' 链接
+            if max_code_num is None:
+                code_list.append(','.join(thscode))
+            else:
+                # 如果 max_code_num 有值，自动分段切割
+                for a_list in split_chunk(thscode, max_code_num):
+                    code_list.append(','.join(a_list))
+        else:
+            code_list.append(thscode)
+
+        df_list = []
+        for sub_list in code_list:
+            req_data_dic = {"thscode": sub_list, "jsonIndicator": jsonIndicator,
+                            "jsonparam": jsonparam, "globalparam": globalparam,
+                            "begintime": format_2_date_str(begintime),
+                            "endtime": format_2_date_str(endtime)
+                            }
+            req_data = json.dumps(req_data_dic)
+            json_dic = self._public_post(path, req_data)
+            if json_dic is None or len(json_dic) == 0:
+                continue
+            df = pd.DataFrame(json_dic)
+            df_list.append(df)
+
+        if len(df_list) > 0:
+            df = pd.concat(df_list)
+        else:
+            df = None
         return df
 
-    def THS_HighFrequenceSequence(self, thscode, jsonIndicator, jsonparam, begintime, endtime) -> pd.DataFrame:
+    def THS_HighFrequenceSequence(self, thscode, jsonIndicator, jsonparam, begintime, endtime,max_code_num=None) -> pd.DataFrame:
         """
         高频序列
         :param thscode:同花顺代码，可以是单个代码也可以是多个代码，代码之间用逗号(‘,’)隔开。例如 600004.SH,600007.SH
@@ -118,19 +138,38 @@ class IFinDInvoker:
         :return:
         """
         path = 'THS_HighFrequenceSequence/'
+        code_list = []
         if type(thscode) == list:
-            thscode = ','.join(thscode)
-        req_data_dic = {"thscode": thscode, "jsonIndicator": jsonIndicator,
-                        "jsonparam": jsonparam,
-                        "begintime": format_2_date_str(begintime),
-                        "endtime": format_2_date_str(endtime)
-                        }
-        req_data = json.dumps(req_data_dic)
-        json_dic = self._public_post(path, req_data)
-        df = pd.DataFrame(json_dic)
+            # 如果是 list 数据，自动 ',' 链接
+            if max_code_num is None:
+                code_list = ','.join(thscode)
+            else:
+                for a_list in split_chunk(thscode, max_code_num):
+                    code_list.append(','.join(a_list))
+        else:
+            code_list.append(thscode)
+
+        df_list = []
+        for sub_list in code_list:
+            req_data_dic = {"thscode": sub_list, "jsonIndicator": jsonIndicator,
+                            "jsonparam": jsonparam,
+                            "begintime": format_2_date_str(begintime),
+                            "endtime": format_2_date_str(endtime)
+                            }
+            req_data = json.dumps(req_data_dic)
+            json_dic = self._public_post(path, req_data)
+            if json_dic is None or len(json_dic) == 0:
+                continue
+            df = pd.DataFrame(json_dic)
+            df_list.append(df)
+
+        if len(df_list) > 0:
+            df = pd.concat(df_list)
+        else:
+            df = None
         return df
 
-    def THS_RealtimeQuotes(self, thscode, jsonIndicator, jsonparam) -> pd.DataFrame:
+    def THS_RealtimeQuotes(self, thscode, jsonIndicator, jsonparam, max_code_num=None) -> pd.DataFrame:
         """
         实时序列
         :param thscode:同花顺代码，可以是单个代码也可以是多个代码，代码之间用逗号(‘,’)隔开。例如 600004.SH,600007.SH
@@ -139,17 +178,36 @@ class IFinDInvoker:
         :return:
         """
         path = 'THS_RealtimeQuotes/'
+        code_list = []
         if type(thscode) == list:
-            thscode = ','.join(thscode)
-        req_data_dic = {"thscode": thscode, "jsonIndicator": jsonIndicator,
-                        "jsonparam": jsonparam
-                        }
-        req_data = json.dumps(req_data_dic)
-        json_dic = self._public_post(path, req_data)
-        df = pd.DataFrame(json_dic)
+            # 如果是 list 数据，自动 ',' 链接
+            if max_code_num is None:
+                code_list = ','.join(thscode)
+            else:
+                for a_list in split_chunk(thscode, max_code_num):
+                    code_list.append(','.join(a_list))
+        else:
+            code_list.append(thscode)
+
+        df_list = []
+        for sub_list in code_list:
+            req_data_dic = {"thscode": sub_list, "jsonIndicator": jsonIndicator,
+                            "jsonparam": jsonparam
+                            }
+            req_data = json.dumps(req_data_dic)
+            json_dic = self._public_post(path, req_data)
+            if json_dic is None or len(json_dic) == 0:
+                continue
+            df = pd.DataFrame(json_dic)
+            df_list.append(df)
+
+        if len(df_list) > 0:
+            df = pd.concat(df_list)
+        else:
+            df = None
         return df
 
-    def THS_HistoryQuotes(self, thscode, jsonIndicator, jsonparam, begintime, endtime) -> pd.DataFrame:
+    def THS_HistoryQuotes(self, thscode, jsonIndicator, jsonparam, begintime, endtime, max_code_num=None) -> pd.DataFrame:
         """
         历史序列
         :param thscode:同花顺代码，可以是单个代码也可以是多个代码，代码之间用逗号(‘,’)隔开。例如 600004.SH,600007.SH
@@ -160,19 +218,39 @@ class IFinDInvoker:
         :return:
         """
         path = 'THS_HistoryQuotes/'
+        code_list = []
         if type(thscode) == list:
-            thscode = ','.join(thscode)
-        req_data_dic = {"thscode": thscode, "jsonIndicator": jsonIndicator,
-                        "jsonparam": jsonparam,
-                        "begintime": format_2_date_str(begintime),
-                        "endtime": format_2_date_str(endtime)
-                        }
-        req_data = json.dumps(req_data_dic)
-        json_dic = self._public_post(path, req_data)
-        df = pd.DataFrame(json_dic)
+            # 如果是 list 数据，自动 ',' 链接
+            if max_code_num is None:
+                code_list.append(','.join(thscode))
+            else:
+                # 如果 max_code_num 有值，自动分段切割
+                for a_list in split_chunk(thscode, max_code_num):
+                    code_list.append(','.join(a_list))
+        else:
+            code_list.append(thscode)
+
+        df_list = []
+        for sub_list in code_list:
+            req_data_dic = {"thscode": sub_list, "jsonIndicator": jsonIndicator,
+                            "jsonparam": jsonparam,
+                            "begintime": format_2_date_str(begintime),
+                            "endtime": format_2_date_str(endtime)
+                            }
+            req_data = json.dumps(req_data_dic)
+            json_dic = self._public_post(path, req_data)
+            if json_dic is None or len(json_dic) == 0:
+                continue
+            df = pd.DataFrame(json_dic)
+            df_list.append(df)
+
+        if len(df_list) > 0:
+            df = pd.concat(df_list)
+        else:
+            df = None
         return df
 
-    def THS_Snapshot(self, thscode, jsonIndicator, jsonparam, begintime, endtime) -> pd.DataFrame:
+    def THS_Snapshot(self, thscode, jsonIndicator, jsonparam, begintime, endtime, max_code_num=None) -> pd.DataFrame:
         """
         日内快照序列
         :param thscode:同花顺代码，可以是单个代码也可以是多个代码，代码之间用逗号(‘,’)隔开。例如 600004.SH,600007.SH
@@ -183,16 +261,36 @@ class IFinDInvoker:
         :return:
         """
         path = 'THS_Snapshot/'
+        code_list = []
         if type(thscode) == list:
-            thscode = ','.join(thscode)
-        req_data_dic = {"thscode": thscode, "jsonIndicator": jsonIndicator,
-                        "jsonparam": jsonparam,
-                        "begintime": format_2_date_str(begintime),
-                        "endtime": format_2_date_str(endtime)
-                        }
-        req_data = json.dumps(req_data_dic)
-        json_dic = self._public_post(path, req_data)
-        df = pd.DataFrame(json_dic)
+            # 如果是 list 数据，自动 ',' 链接
+            if max_code_num is None:
+                code_list.append(','.join(thscode))
+            else:
+                # 如果 max_code_num 有值，自动分段切割
+                for a_list in split_chunk(thscode, max_code_num):
+                    code_list.append(','.join(a_list))
+        else:
+            code_list.append(thscode)
+
+        df_list = []
+        for sub_list in code_list:
+            req_data_dic = {"thscode": sub_list, "jsonIndicator": jsonIndicator,
+                            "jsonparam": jsonparam,
+                            "begintime": format_2_date_str(begintime),
+                            "endtime": format_2_date_str(endtime)
+                            }
+            req_data = json.dumps(req_data_dic)
+            json_dic = self._public_post(path, req_data)
+            if json_dic is None or len(json_dic) == 0:
+                continue
+            df = pd.DataFrame(json_dic)
+            df_list.append(df)
+
+        if len(df_list) > 0:
+            df = pd.concat(df_list)
+        else:
+            df = None
         return df
 
     def THS_BasicData(self, thsCode, indicatorName, paramOption, max_code_num=None) -> pd.DataFrame:
