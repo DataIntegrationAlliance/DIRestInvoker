@@ -125,10 +125,15 @@ class IFinDInvoker:
                 df_list.append(df)
         except APIError as exp:
             if len(df_list) == 0:
-                raise exp from exp
+                if 'errcode' in exp.ret_dic and exp.ret_dic['errcode'] == -4001:
+                    logger.warning('THS_DateSerial(%s, %s, %s, %s, %s, %s, %s) 没有数据',
+                                   thscode, jsonIndicator, jsonparam, globalparam, begintime, endtime, max_code_num)
+                else:
+                    raise exp from exp
             else:
                 # 对于分段查询的情况，如果中途某一段产生错误（可能是流量不够）则不抛出异常，而将已查询出来的数据返回
-                logger.exception('THS_DateSerial(%s, %s, %s, %s,%s, %s, %s, %s) 失败', thscode, jsonIndicator, jsonparam, globalparam, begintime, endtime, max_code_num)
+                logger.exception('THS_DateSerial(%s, %s, %s, %s, %s, %s, %s) 失败',
+                                 thscode, jsonIndicator, jsonparam, globalparam, begintime, endtime, max_code_num)
         finally:
             if len(df_list) > 0:
                 df = pd.concat(df_list)
@@ -177,7 +182,8 @@ class IFinDInvoker:
                 raise exp from exp
             else:
                 # 对于分段查询的情况，如果中途某一段产生错误（可能是流量不够）则不抛出异常，而将已查询出来的数据返回
-                logger.exception('THS_HighFrequenceSequence(%s, %s, %s, %s,%s, %s, %s) 失败', thscode, jsonIndicator, jsonparam, begintime, endtime, max_code_num)
+                logger.exception('THS_HighFrequenceSequence(%s, %s, %s, %s, %s, %s) 失败',
+                                 thscode, jsonIndicator, jsonparam, begintime, endtime, max_code_num)
         finally:
             if len(df_list) > 0:
                 df = pd.concat(df_list)
@@ -222,7 +228,8 @@ class IFinDInvoker:
                 raise exp from exp
             else:
                 # 对于分段查询的情况，如果中途某一段产生错误（可能是流量不够）则不抛出异常，而将已查询出来的数据返回
-                logger.exception('THS_RealtimeQuotes(%s, %s, %s, %s) 失败', thscode, jsonIndicator, jsonparam, max_code_num)
+                logger.exception('THS_RealtimeQuotes(%s, %s, %s, %s) 失败',
+                                 thscode, jsonIndicator, jsonparam, max_code_num)
         finally:
             if len(df_list) > 0:
                 df = pd.concat(df_list)
@@ -272,7 +279,8 @@ class IFinDInvoker:
                 raise exp from exp
             else:
                 # 对于分段查询的情况，如果中途某一段产生错误（可能是流量不够）则不抛出异常，而将已查询出来的数据返回
-                logger.exception('THS_HistoryQuotes(%s, %s, %s, %s, %s, %s) 失败', thscode, jsonIndicator, jsonparam, begintime, endtime, max_code_num)
+                logger.exception('THS_HistoryQuotes(%s, %s, %s, %s, %s, %s) 失败',
+                                 thscode, jsonIndicator, jsonparam, begintime, endtime, max_code_num)
         finally:
             if len(df_list) > 0:
                 df = pd.concat(df_list)
@@ -322,7 +330,8 @@ class IFinDInvoker:
                 raise exp from exp
             else:
                 # 对于分段查询的情况，如果中途某一段产生错误（可能是流量不够）则不抛出异常，而将已查询出来的数据返回
-                logger.exception('THS_Snapshot(%s, %s, %s, %s, %s, %s) 失败', thscode, jsonIndicator, jsonparam, begintime, endtime, max_code_num)
+                logger.exception('THS_Snapshot(%s, %s, %s, %s, %s, %s) 失败',
+                                 thscode, jsonIndicator, jsonparam, begintime, endtime, max_code_num)
         finally:
             if len(df_list) > 0:
                 df = pd.concat(df_list)
@@ -369,7 +378,8 @@ class IFinDInvoker:
                 raise exp from exp
             else:
                 # 对于分段查询的情况，如果中途某一段产生错误（可能是流量不够）则不抛出异常，而将已查询出来的数据返回
-                logger.exception('THS_BasicData(%s, %s, %s, %s) 失败', thsCode, indicatorName, paramOption, max_code_num)
+                logger.exception('THS_BasicData(%s, %s, %s, %s) 失败',
+                                 thsCode, indicatorName, paramOption, max_code_num)
         finally:
             # 合并数据
             if len(df_list) > 0:
