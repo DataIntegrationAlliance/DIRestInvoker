@@ -6,61 +6,10 @@ Created on 2016-12-22
 import pandas as pd
 import requests
 import json
-from datetime import datetime, date
+import logging
+from direstinvoker import format_2_date_str, format_2_datetime_str, APIError
 
-STR_FORMAT_DATE = '%Y-%m-%d'
-STR_FORMAT_DATETIME_WIND = '%Y-%m-%d %H:%M:%S'  # 2017-03-06 00:00:00.005000
-UN_AVAILABLE_DATETIME = datetime.strptime('1900-01-01', STR_FORMAT_DATE)
-UN_AVAILABLE_DATE = UN_AVAILABLE_DATETIME.date()
-
-
-def format_2_date_str(dt) -> str:
-    if dt is None:
-        return None
-    dt_type = type(dt)
-    if dt_type == str:
-        return dt
-    elif dt_type == date:
-        if dt > UN_AVAILABLE_DATE:
-            return dt.strftime(STR_FORMAT_DATE)
-        else:
-            return None
-    elif dt_type == datetime:
-        if dt > UN_AVAILABLE_DATETIME:
-            return dt.strftime(STR_FORMAT_DATE)
-        else:
-            return None
-    else:
-        return dt
-
-
-def format_2_datetime_str(dt) -> str:
-    if dt is None:
-        return None
-    dt_type = type(dt)
-    if dt_type == str:
-        return dt
-    elif dt_type == date:
-        if dt > UN_AVAILABLE_DATE:
-            return dt.strftime(STR_FORMAT_DATE)
-        else:
-            return None
-    elif dt_type == datetime:
-        if dt > UN_AVAILABLE_DATETIME:
-            return dt.strftime(STR_FORMAT_DATETIME_WIND)
-        else:
-            return None
-    else:
-        return dt
-
-
-class APIError(Exception):
-    def __init__(self, status, ret_dic):
-        self.status = status
-        self.ret_dic = ret_dic
-
-    def __str__(self):
-        return "APIError:status=POST / {} {}".format(self.status, self.ret_dic)
+logger = logging.getLogger('wind')
 
 
 class WindRestInvoker:
@@ -264,7 +213,7 @@ class WindRestInvoker:
 
 if __name__ == "__main__":
     # url_str = "http://10.0.5.65:5000/wind/"
-    url_str = "http://localhost:5000/wind/"
+    url_str = "http://10.0.3.66:5000/wind/"
     invoker = WindRestInvoker(url_str)
     # data_df = invoker.wset(tablename="sectorconstituent", options="date=2017-03-21;sectorid=1000023121000000")
     # data_df = invoker.wss(codes=["601398.SH", "600123.SH"], fields="sec_name,trade_code,ipo_date,delist_date,mkt,exch_city,exch_eng,prename")
@@ -272,14 +221,22 @@ if __name__ == "__main__":
     # data_df = invoker.tdays(begin_time="2017-01-04", end_time="2017-02-28")
     # data_df = invoker.wst("600000.SH", "ask1,bid1,asize1,bsize1,volume,amt,pre_close,open,high,low,last", "2017-10-20 09:15:00", "2017-10-20 09:26:00", "")
     # data_df = invoker.wsi("RU1801.SHF", "open,high,low,close,volume,amt,oi", "2017-12-8 09:00:00", "2017-12-8 11:30:00", "")
+    # data = invoker.edb('M0017126,M0017127,M0017128', '2016-11-10', '2018-11-10', "Fill=Previous")
 
     try:
-        data_df = invoker.wss(codes=["601398.SH", "600123.SH"], fields="sec_name,trade_code,ipo_date,delist_date,mkt,exch_city,exch_eng,prename")
+        data_df = invoker.wsd("0382.HK", "open,high,low,close,adjfactor,volume,amt,pct_chg,maxupordown,swing,turn,free_turn,trade_status,susp_days,total_shares,free_float_shares,ev2_to_ebitda,ps_ttm,pe_ttm,pb_mrq", "2007-02-17", "2007-02-23", None)
         print(data_df)
     except APIError as exp:
         if exp.status == 500:
             print('APIError.status:', exp.status, exp.ret_dic['message'])
         else:
             print(exp.ret_dic.setdefault('error_code', ''), exp.ret_dic['message'])
+
+        logger.exception("执行异常")
+        if exp.ret_dic.setdefault('error_code', 0) in (
+                -40520007,  # 没有可用数据
+                -40521009,  # 数据解码失败。检查输入参数是否正确，如：日期参数注意大小月月末及短二月
+        ):
+            pass
     # date_str = invoker.tdaysoffset(1, '2017-3-31')
     # print(date_str)

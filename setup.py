@@ -14,7 +14,7 @@ with open("README.md", "r", encoding='utf-8') as rm:
     long_description = rm.read()
 
 setup(name='DIRestInvoker',
-      version='0.1.10',
+      version='0.2.0',
       description='调用 DIRestPlus 接口，实现Wind、iFinD、Choice接口调用',
       long_description=long_description,
       long_description_content_type="text/markdown",
