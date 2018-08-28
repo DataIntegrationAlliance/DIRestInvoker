@@ -9,6 +9,7 @@ import json
 import logging
 from direstinvoker.utils.fh_utils import split_chunk
 from direstinvoker import format_2_date_str, APIError
+from simplejson.errors import JSONDecodeError
 
 logger = logging.getLogger('ifind')
 
@@ -25,7 +26,11 @@ class IFinDInvoker:
 
         # print('self._url(path):', self._url(path))
         ret_data = requests.post(self._url(path), data=req_data, headers=self.header)
-        ret_dic = ret_data.json()
+        try:
+            ret_dic = ret_data.json()
+        except JSONDecodeError:
+            logger.exception('%s post %s got error\n', self._url(path), req_data)
+            ret_dic = None
 
         if ret_data.status_code != 200:
             raise APIError(ret_data.status_code, ret_dic)

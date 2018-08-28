@@ -2,3 +2,4 @@ pandas
 requests
 wheel
 xlrd
+simplejson
