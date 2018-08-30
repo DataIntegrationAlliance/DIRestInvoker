@@ -32,7 +32,7 @@ class WindRestInvoker:
             ret_dic = None
 
         if ret_data.status_code != 200:
-            if ret_dic is None and 'error_code' in ret_dic and ret_dic['error_code'] == -4001:
+            if ret_dic is not None and 'error_code' in ret_dic and ret_dic['error_code'] == -4001:
                 logger.error('%s post %s got error\n%s', self._url(path), req_data, ret_dic)
                 return None
             else:
