@@ -5,6 +5,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/DataIntegrationAlliance/DIRestInvoker.svg)](https://github.com/DataIntegrationAlliance/DIRestInvoker/stargazers)
 [![GitHub license](https://img.shields.io/github/license/DataIntegrationAlliance/DIRestInvoker.svg)](https://github.com/DataIntegrationAlliance/DIRestInvoker/blob/master/LICENSE)
 [![HitCount](http://hits.dwyl.io/DataIntegrationAlliance/https://github.com/DataIntegrationAlliance/DIRestInvoker.svg)](http://hits.dwyl.io/DataIntegrationAlliance/https://github.com/DataIntegrationAlliance/DIRestInvoker)
+[![Pypi](https://img.shields.io/badge/pypi-wheel-blue.svg)](https://pypi.org/project/DIRestInvoker/)
 [![Twitter](https://img.shields.io/twitter/url/https/github.com/DataIntegrationAlliance/DIRestInvoker.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2FDataIntegrationAlliance%2FDIRestInvoker)
 
 
