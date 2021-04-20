@@ -8,6 +8,7 @@
 [![Pypi](https://img.shields.io/badge/pypi-wheel-blue.svg)](https://pypi.org/project/DIRestInvoker/)
 [![Twitter](https://img.shields.io/twitter/url/https/github.com/DataIntegrationAlliance/DIRestInvoker.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2FDataIntegrationAlliance%2FDIRestInvoker)
 
+## 项目已迁移到: https://gitee.com/DataIntegrationAlliance/DIRestInvoker.git
 
 Data Integration RESTPlus Invoker，调用 [DIRestPlus](https://github.com/DataIntegrationAlliance/DIRestPlus) 接口，实现Wind、iFinD、Choice接口调用
 
